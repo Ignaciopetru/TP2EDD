@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "queue.h"
 
 typedef struct _Intervalo {
     double inicio;
@@ -186,18 +187,11 @@ AVLTree itree_recorrer_bfs(){}
 
 
 int main() {
-    AVLTree hola = itree_crear();
-    Intervalo inter;
-    inter.inicio = 3;
-    inter.final = 2;
-    hola = insertar(hola, &inter);
-    Intervalo inter2;
-    inter2.inicio = 2;
-    inter2.final = 4;
-    hola = insertar(hola, &inter2);
-    Intervalo inter3;
-    inter3.inicio = 1;
-    inter3.final = 6;
-    hola = insertar(hola, &inter3);
-    itree_recorrer_dfs(hola);
+  Queue cola = queue_new();
+  int a = 1;
+  queue_agregar(cola, &a);
+  int *b = queue_sacar(cola);
+  printf("%d", *b);
+  queue_destruir(cola);
+    
 }

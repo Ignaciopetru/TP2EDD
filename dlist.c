@@ -50,3 +50,10 @@ void dlist_destruir(DList lista, Visitante liberar) {
   }
 }
 
+void * dnodo_dato(DNodo * nodo) {
+  return nodo->dato;
+}
+
+DList dnodo_ant(DNodo * nodo) {
+  return nodo->ant;
+}

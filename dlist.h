@@ -25,6 +25,10 @@ DList dnodo_agregar_inicio(DList, void*);
 // dlist_destruir se encarga de liberar la memoria dedicada a la lista.
 void dlist_destruir (DList, Visitante);
 
+void * dnodo_dato(DNodo *);
+
+DList dnodo_ant(DNodo *);
+
 
 
 #endif

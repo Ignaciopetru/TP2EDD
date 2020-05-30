@@ -1,9 +1,7 @@
 #ifndef QUEUE_H_INLCUDED
 #define QUEUE_H_INLCUDED
 
-typedef struct _Queue QueueA;
-
-typedef QueueA* Queue;
+typedef struct _Queue* Queue;
 
 Queue queue_new ();
 
