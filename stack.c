@@ -2,50 +2,64 @@
 #include <stdlib.h>
 #include "stack.h"
 
-struct _Stack{
-  void** array;
-  int primero;
-  int largo;
-};
+/**
+ * Función que inicializa la stack con una cantidad entera de elementos
+ * init_Stack: Int->Stack
+ */
+Stack init_Stack(int len) {
+  return (Stack) {.data = malloc(sizeof(void *) * len),.pos = 0};
+}
 
-Stack stack_new (int largo) {
-  Stack stack = malloc(sizeof(Stack));
-  stack->array = malloc(sizeof(void*)*largo);
-  stack->largo = largo;
-  stack->primero = -1;
+/**
+ * Función que verifica si la stack está o no vacía
+ * vacio_Stack: Stack->Bool
+ */
+int vacio_Stack(Stack stack) {
+  return stack.pos == 0;
+}
+
+/**
+ * Función que verifica si la stack posee solamente un elemento
+ *largo_uno_solo: Stack->Bool
+ */
+int largo_uno_solo(Stack stack) {
+  return stack.pos == 1;
+}
+
+/**
+ * Función que permite agregar un elemento al stack
+ * push_stack: Stack, void* -> Stack 
+ */
+Stack push_stack(Stack stack, void *elem) {
+  stack.data[stack.pos] = elem;
+  stack.pos++;
   return stack;
 }
 
-int stack_isEmpty (Stack stack) {
-  return stack->primero == -1;
+/**
+ * Función que permite sacar un elemento de la stack
+ * pop_stack: Stack -> Stack
+ */
+Stack pop_stack(Stack stack) {
+  stack.pos--;
+  return stack;
 }
 
-int stack_unoSolo (Stack stack) {
-  return stack->primero == 0;
+/**
+ * Función que permite "Ojear" los datos del primer elemento de la stack
+ * peek_Stack: Stack -> void*
+ */
+void *top_Stack(Stack stack) {
+  if (stack.pos == 0)
+    return NULL;
+  else
+    return stack.data[stack.pos - 1];
 }
 
-
-void stack_push (Stack stack, void* dato) {
-  if (stack->primero + 1 == stack->largo) {
-    printf("Se esta exediendo la capacidad de la stack");
-    return;
-  }
-  stack->array[stack->primero + 1] = dato;
-  stack->primero ++;
-}
-
-
-void* stack_top (Stack stack) {
-  return stack->array[stack->primero];
-}
-
-void stack_pop (Stack stack) {
-  stack->array[stack->primero] = NULL;
-  stack->primero --;
-}
-
-
-void stack_destruir (Stack stack) {
-  free(stack->array);
-  free(stack);
+/**
+ * Función que permite liberar la memoria del stack
+ * destruir_Stack(Stack)
+ */
+void destruir_Stack(Stack stack) {
+  free(stack.data);
 }

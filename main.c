@@ -1,6 +1,9 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "queue.h"
+#include "stack.h"
+
 
 typedef struct _Intervalo {
     double inicio;
@@ -175,23 +178,49 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo *dato){
 AVLTree itree_destruir(){}
 
 // Funciones recorrer
-void itree_recorrer_dfs(AVLTree arbol) {
+void inorder(AVLTree arbol) {
   if(arbol == NULL)
     return;
-  itree_recorrer_dfs(arbol->izq);
+  inorder(arbol->izq);
   printf("[%f, %f]-%d\n", arbol->dato->inicio, arbol->dato->final, arbol->altura);
-  itree_recorrer_dfs(arbol->der);
+  inorder(arbol->der);
 }
+
+void itree_recorrer_dfs(AVLTree arbol) {
+  Stack stack = init_Stack(pow(2, arbol->altura));
+  stack = push_stack(stack, arbol);
+  while (!vacio_Stack(stack)) { 
+    AVLTree nodo = top_Stack(stack);
+    stack = pop_stack(stack);
+    if (nodo != NULL) {
+      printf("[%f, %f]\n", nodo->dato->inicio, nodo->dato->final);
+      stack = push_stack(stack, nodo->der);
+      stack = push_stack(stack, nodo->izq);
+    }
+  }
+}
+
 AVLTree itree_recorrer_bfs(){}
 
 
 
 int main() {
-  Queue cola = queue_new();
-  int a = 1;
-  queue_agregar(cola, &a);
-  int *b = queue_sacar(cola);
-  printf("%d", *b);
-  queue_destruir(cola);
-    
+  AVLTree arbol = NULL;
+  Intervalo aux1;
+  aux1.inicio = 1;
+  aux1.final = 2; 
+  arbol = insertar(arbol, &aux1);
+
+  Intervalo aux2;
+  aux2.inicio = 2;
+  aux2.final = 3;
+  arbol = insertar(arbol, &aux2);
+
+  Intervalo aux3;
+  aux3.inicio = 3;
+  aux3.final = 4;
+  arbol = insertar(arbol, &aux3);
+
+  inorder(arbol);
+  itree_recorrer_dfs(arbol);
 }

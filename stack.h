@@ -1,20 +1,52 @@
-#ifndef STACK_H_INLCUDED
-#define STACK_H_INLCUDED
+#ifndef ESTRUCTURA_DE_DATOS_I_2020_TP1_STACK_H
+#define ESTRUCTURA_DE_DATOS_I_2020_TP1_STACK_H
 
-typedef struct _Stack* Stack;
+typedef struct {
+  void **data;
+  int pos;
+} Stack;
 
-Stack stack_new (int);
+/**
+ * Función que inicializa la stack con una cantidad entera de elementos
+ * init_Stack: Int->Stack
+ */
+Stack init_Stack(int len);
 
-void stack_push (Stack, void*);
+/**
+ * Función que verifica si la stack está o no vacía
+ * vacio_Stack: Stack->Bool
+ */
 
-void stack_pop (Stack);
+int vacio_Stack(Stack stack);
 
-void* stack_top (Stack);
+/**
+ * Función que verifica si la stack posee solamente un elemento
+ *largo_uno_solo: Stack->Bool
+ */
+int largo_uno_solo(Stack stack);
 
-int stack_unoSolo (Stack);
+/**
+ * Función que permite agregar un elemento al stack
+ * push_stack: Stack, void* -> Stack 
+ */
+Stack push_stack(Stack stack, void *elem);
 
-int stack_isEmpty (Stack);
+/**
+ * Función que permite sacar un elemento de la stack
+ * pop_stack: Stack -> Stack
+ */
+Stack pop_stack(Stack stack);
 
-void stack_destruir (Stack);
+/**
+ * Función que permite "Ojear" los datos del primer elemento de la stack
+ * peek_Stack: Stack -> void*
+ */
+void *top_Stack(Stack stack);
 
-#endif
+/**
+ * Función que permite liberar la memoria del stack
+ * destruir_Stack(Stack)
+ */
+void destruir_Stack(Stack stack);
+
+#endif                          //ESTRUCTURA_DE_DATOS_I_2020_TP1_STACK_H
