@@ -7,7 +7,7 @@ typedef struct _Intervalo {
 } Intervalo;
 
 typedef struct _AVLNodo {
-    Intervalo dato;
+    Intervalo *dato;
     int altura;
     double mayorFinal;
     struct _AVLNodo *der;
@@ -26,34 +26,15 @@ int obtener_altura(AVLTree arbol) {
 }
 
 int obtener_balance(AVLTree arbol){
+  if(arbol)
     return obtener_altura(arbol->der) - obtener_altura(arbol->izq);
+  return 0;
 }
 
 int max(int a, int b) {
     if(a > b)
         return a;
     return b;
-}
-
-AVLTree balancear(AVLTree arbol, int balance){
-    //Izquierda Izquierda
-    if(balance < -1 && obtener_balance(arbol->izq >= 0))
-        return rotar_derecha(arbol);
-    // Izquierda derecha
-    if(balance < -1 && obtener_balance(arbol->izq < 0)){
-        arbol->izq = rotar_izquierda(arbol->izq);
-        return rotar_derecha(arbol);
-    }
-    // Derecha derecha
-    if(balance > 1 && obtener_balance(arbol->izq <= 0))
-        return rotar_izquierda(arbol);
-    // Derecha izquieda
-    if(balance > 1 && obtener_balance(arbol->izq > 0)){
-        arbol->der = rotar_derecha(arbol->der);
-        return rotar_izquierda(arbol);
-    }
-    // Arbol balanceado
-    return arbol;
 }
 
 // Funciones de rotacion
@@ -64,8 +45,8 @@ AVLTree rotar_derecha(AVLTree arbol) {
     arbol->izq = copArbolIzq->der;
     copArbolIzq->der = arbol;
     // Recalculamos altura
-    arbol->altura = max(obtenerAltura(arbol->izq), obtenerAltura(arbol->der)) + 1;
-    copArbolIzq->altura = max(obtenerAltura(copArbolIzq->izq), obtenerAltura(copArbolIzq->der)) + 1;
+    arbol->altura = max(obtener_altura(arbol->izq), obtener_altura(arbol->der)) + 1;
+    copArbolIzq->altura = max(obtener_altura(copArbolIzq->izq), obtener_altura(copArbolIzq->der)) + 1;
     // Se retorna el nuevo primer nodo
     return copArbolIzq;
 }
@@ -77,11 +58,33 @@ AVLTree rotar_izquierda(AVLTree arbol) {
     arbol->der = copArbolDer->izq;
     copArbolDer->izq = arbol;
     // Recalculamos altura
-    arbol->altura = max(obtenerAltura(arbol->izq), obtenerAltura(arbol->der)) + 1;
-    copArbolDer->altura = max(obtenerAltura(copArbolDer->izq), obtenerAltura(copArbolDer->der)) + 1;
+    arbol->altura = max(obtener_altura(arbol->izq), obtener_altura(arbol->der)) + 1;
+    copArbolDer->altura = max(obtener_altura(copArbolDer->izq), obtener_altura(copArbolDer->der)) + 1;
     // Se retorna el nuevo primer nodo
     return copArbolDer;
 }
+
+AVLTree balancear(AVLTree arbol, int balance){
+    //Izquierda Izquierda
+    if(balance < -1 && obtener_balance(arbol->izq) < 0)
+        return rotar_derecha(arbol);
+    // Izquierda derecha
+    if(balance < -1 && obtener_balance(arbol->izq) >= 0){
+        arbol->izq = rotar_izquierda(arbol->izq);
+        return rotar_derecha(arbol);
+    }
+    // Derecha derecha
+    if(balance > 1 && obtener_balance(arbol->izq) <= 0)
+        return rotar_izquierda(arbol);
+    // Derecha izquieda
+    if(balance > 1 && obtener_balance(arbol->izq) > 0){
+        arbol->der = rotar_derecha(arbol->der);
+        return rotar_izquierda(arbol);
+    }
+    // Arbol balanceado
+    return arbol;
+}
+
 
 // Funciones creacion
 
@@ -89,22 +92,32 @@ AVLTree itree_crear() {
     return NULL;
 }
 
-AVLTree insertar(AVLTree arbol, Intervalo dato) {
+AVLTree nodo_crear(Intervalo *dato) {
+    AVLTree nodo = malloc(sizeof(AVLNodo));
+    nodo->der = NULL;
+    nodo->izq = NULL;
+    nodo->altura = 1;
+    nodo->mayorFinal = 0;
+    nodo->dato = dato;
+    return nodo;
+}
+
+AVLTree insertar(AVLTree arbol, Intervalo *dato) {
     // Si llegamos a nodo vacio insertamos nuestro nodo nuevo
     if (arbol == NULL) {
-        //return crear nodo
+        return nodo_crear(dato);
     }
     // Buscamos la posicion que debe ocupar el nuevo nodo
     // segun BST
-    if (dato.inicio > arbol->dato->inicio)
-        arbol->izq = insertar(arbol->izq, dato);    
-    if else (dato->inicio < arbol->dato->inicio)
-        arbol.der = insertar(arbol->der, dato);
+    if (dato->inicio > arbol->dato->inicio)
+        arbol->der = insertar(arbol->der, dato);
+    else if (dato->inicio < arbol->dato->inicio)
+        arbol->izq = insertar(arbol->izq, dato);
     // Caso en el que el nodo ya este en el arbol
     else
         return arbol;
     // Recalculamos la altura de cada nuevo nodo
-    arbol->altura = 1 + max(arbol->izq->altura, arbol->der->altura);
+    arbol->altura = 1 + max(obtener_altura(arbol->izq), obtener_altura(arbol->der));
     // Calculamos el valor de balance de el nodo y procedemos a balancear correctamente
     int balance = obtener_balance(arbol);
     return balancear(arbol, balance);
@@ -114,12 +127,12 @@ AVLTree insertar(AVLTree arbol, Intervalo dato) {
 AVLTree itree_intersectar(){}
 
 // Funciones destrucción
-AVLTree itree_eliminar(AVLTree arbol, Intervalo dato){
+AVLTree itree_eliminar(AVLTree arbol, Intervalo *dato){
   if(arbol == NULL)
     return arbol;
-  if(dato.inicio < arbol->dato.inicio)
+  if(dato->inicio < arbol->dato->inicio)
     arbol->izq = itree_eliminar(arbol->izq, dato); //! Cada recursion se copia "Intervalo dato"
-  else if(dato.inicio > arbol->dato.inicio)
+  else if(dato->inicio > arbol->dato->inicio)
     arbol->der = itree_eliminar(arbol->der, dato); //TODO El recorrido izq / der se puede hacer aparte
   else{
     if(arbol->der == NULL || arbol->izq == NULL){
@@ -138,7 +151,7 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo dato){
       AVLNodo* actual = arbol->der;
       while(actual->izq != NULL)
         actual = actual->izq;
-      
+
       // Copio los datos del nodo encontrado y borro ese nodo
       arbol->dato = actual->dato;
       arbol->der = itree_eliminar(arbol->der, actual->dato);
@@ -161,11 +174,30 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo dato){
 AVLTree itree_destruir(){}
 
 // Funciones recorrer
-AVLTree itree_recorrer_dfs(){}
+void itree_recorrer_dfs(AVLTree arbol) {
+  if(arbol == NULL)
+    return;
+  itree_recorrer_dfs(arbol->izq);
+  printf("[%f, %f]-%d\n", arbol->dato->inicio, arbol->dato->final, arbol->altura);
+  itree_recorrer_dfs(arbol->der);
+}
 AVLTree itree_recorrer_bfs(){}
 
 
 
 int main() {
-    
+    AVLTree hola = itree_crear();
+    Intervalo inter;
+    inter.inicio = 3;
+    inter.final = 2;
+    hola = insertar(hola, &inter);
+    Intervalo inter2;
+    inter2.inicio = 2;
+    inter2.final = 4;
+    hola = insertar(hola, &inter2);
+    Intervalo inter3;
+    inter3.inicio = 1;
+    inter3.final = 6;
+    hola = insertar(hola, &inter3);
+    itree_recorrer_dfs(hola);
 }
