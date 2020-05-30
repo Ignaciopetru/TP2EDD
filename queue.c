@@ -1,43 +1,50 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "queue.h"
-#include "dlist.h"
 
-struct _Queue{
-  DList primero;
-  DList ultimo;
+struct _Queue {
+    void **queue;
+    int primero, ultimo, numElem;
+    int MAX_ELEM;
 };
 
-Queue queue_new () {
-    Queue cola = malloc(sizeof(struct _Queue));
-    cola->primero = NULL;
-    cola->ultimo = NULL;
-    return cola;
+Queue queue_new(int cant) {
+    Queue q = malloc(sizeof(struct _Queue));
+    q->queue= malloc(sizeof(void *)*cant);
+    q->MAX_ELEM=cant ;
+    q->numElem=0;
+    q->primero=0;
+    q->ultimo=-1;
+    return q;
 }
-
-int queue_isEmpty (Queue cola) {
-  return cola->primero == NULL;
+int queue_isEmpty(Queue q)
+{
+    return(q->numElem==0);
 }
-
-void queue_agregar (Queue cola, void *dato) {
-  if (queue_isEmpty(cola)) {
-    cola->primero = dnodo_agregar_inicio(cola->primero, dato);
-    cola->ultimo = cola->primero;
-  } else
-    cola->primero = dnodo_agregar_inicio(cola->primero, dato);
+Queue queue_agregar(Queue q, void * d)
+{
+    if(q->numElem == q->MAX_ELEM){
+        q->MAX_ELEM++;
+        q->queue=realloc(q->queue,sizeof(int)*q->MAX_ELEM);
+    }
+    else{
+        q->ultimo=(q->ultimo+1)%q->MAX_ELEM;
+        q->queue[q->ultimo]=d;
+        q->numElem++;
+    }
+    return q;
 }
-
-void* queue_sacar (Queue cola) {
-  if (cola->primero == NULL)
-    return NULL; 
-  void * dato = dnodo_dato(cola->ultimo);
-  DList ultimo = cola->ultimo;
-  cola->ultimo = dnodo_ant(cola->ultimo);
-  free(ultimo);
-  return dato;
-}
-
-void queue_destruir (Queue cola) {
-  dlist_destruir(cola->primero, NULL);
-  free(cola);
+void *queue_sacar(Queue q)
+{
+    if(!queue_isEmpty(q))
+    {
+        void *d=(q->queue[q->primero]);
+        q->primero=((q->primero)+1)%(q->MAX_ELEM);
+        (q->numElem)--;
+        return d;
+    }
+    else
+    {
+        return NULL;
+    }
 }

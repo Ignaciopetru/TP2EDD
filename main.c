@@ -200,7 +200,19 @@ void itree_recorrer_dfs(AVLTree arbol) {
   }
 }
 
-AVLTree itree_recorrer_bfs(){}
+void itree_recorrer_bfs(AVLTree arbol) {
+  Queue queue = queue_new(pow(2, arbol->altura));
+  queue = queue_agregar(queue, arbol);
+  while (!queue_isEmpty(queue)) { 
+    AVLTree nodo = queue_sacar(queue);
+    if (nodo != NULL) {
+      printf("[%f, %f]\n", nodo->dato->inicio, nodo->dato->final);
+      queue = queue_agregar(queue, nodo->izq);
+      queue = queue_agregar(queue, nodo->der);
+    }
+  }
+
+}
 
 
 
@@ -220,7 +232,7 @@ int main() {
   aux3.inicio = 3;
   aux3.final = 4;
   arbol = insertar(arbol, &aux3);
-
+  
   inorder(arbol);
-  itree_recorrer_dfs(arbol);
+  itree_recorrer_bfs(arbol);
 }

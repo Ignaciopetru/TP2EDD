@@ -1,7 +1,7 @@
 all: main
 
 main: stack.o dlist.o queue.o main.c
-	gcc -o main main.c queue.o dlist.o stack.o -lm
+	gcc -o main -g main.c queue.o dlist.o stack.o -lm
 
 stack.o: stack.c stack.h
 	gcc -c -Wall -Wextra -Werror -g stack.c

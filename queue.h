@@ -3,11 +3,11 @@
 
 typedef struct _Queue* Queue;
 
-Queue queue_new ();
+Queue queue_new (int);
 
 int queue_isEmpty (Queue);
 
-void queue_agregar (Queue, void*);
+Queue queue_agregar (Queue, void*);
 
 void * queue_sacar (Queue);
 
