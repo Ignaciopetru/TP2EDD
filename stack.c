@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "stack.h"
+#include "headers/stack.h"
 
 /**
  * Función que inicializa la stack con una cantidad entera de elementos
