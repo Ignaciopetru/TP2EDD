@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "stack.h"
-#include "dlist.h"
+#include "dlist/dlist.h"
 
 struct _Stack{
   DList primero;
