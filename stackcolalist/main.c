@@ -1,56 +1,10 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "headers/queue.h"
-#include "headers/stack.h"
+#include "queue.h"
+#include "stack.h"
 
-//TODO
 
-//-itree crear ✔️
-  // * Implementar ✔️
-//-itree destruir
-  // * Implementar
-
-//-itree insertar
-  // * Analizar que pasa con el segundo valor (ver en itree_destruir)
-  // * Ver si se puede unir la parte de recorrer el arbol con eliminar y intersecar ///
-
-//-itree eliminar
-  // * Falta liberar la memoria del nodo y el puntero de su padre que apunta a el✔️
-  // * Ver si se puede unir la parte de recorrer el arbol con insertar e intersecar ///
-
-// itree intersectar
-  // * Implementar
-  // * Ver si se puede unir la parte de recorrer el arbol con insertar y eliminar ///
-  // * Testear su funcionamiento
-
-// itree recorrer dfs ❓
-
-// itree recorrer bfs ❓
-
-// mayorFinal (AVLNodo)
-  // * Darle uso
-  // * Adaptar insertar y eliminar para que la modifiquen
-
-// Interfaz
-  // * Hacerla (main)
-
-// Queue y Stack
-  // * Ver tema crecimiento dinamico
-  // * Mejorar escritura✔️
-
-// inodo_liberar
-  // * Implementar ✔️
-  // * Ver si no filtramos memoria
-  
-// AVL
-  // * Pasar a su propio archivo y cabecera
-
-// Rotar ✔️
-  // * Testear derecha izquierda e izquierda derecha ✔️
-
-// Informe
-  // * Hacer
 
 typedef struct _Intervalo {
     double inicio;
@@ -254,29 +208,29 @@ void inorder(AVLTree arbol) {
 }
 
 void itree_recorrer_dfs(AVLTree arbol) {
-  Stack stack = stack_new(pow(2, arbol->altura));
-  stack = stack_push(stack, arbol);
-  while (!stack_isEmpty(stack)) { 
+  Stack stack = stack_new();
+  stack_push(stack, arbol);
+  while (!stack_isEmpty(stack)) {
     AVLTree nodo = stack_top(stack);
-    stack = stack_pop(stack);
+    stack_pop(stack);
     if (nodo != NULL) {
       printf("[%f, %f]\n", nodo->dato->inicio, nodo->dato->final);
-      stack = stack_push(stack, nodo->der);
-      stack = stack_push(stack, nodo->izq);
+      stack_push(stack, nodo->der);
+      stack_push(stack, nodo->izq);
     }
   }
   stack_destruir(stack);
 }
 
 void itree_recorrer_bfs(AVLTree arbol) {
-  Queue queue = queue_new(pow(2, arbol->altura));
-  queue = queue_agregar(queue, arbol);
-  while (!queue_isEmpty(queue)) { 
+  Queue queue = queue_new();
+  queue_agregar(queue, arbol);
+  while (!queue_isEmpty(queue)) {
     AVLTree nodo = queue_sacar(queue);
     if (nodo != NULL) {
       printf("[%f, %f]\n", nodo->dato->inicio, nodo->dato->final);
-      queue = queue_agregar(queue, nodo->izq);
-      queue = queue_agregar(queue, nodo->der);
+      queue_agregar(queue, nodo->izq);
+      queue_agregar(queue, nodo->der);
     }
   }
   queue_destruir(queue);
@@ -285,6 +239,8 @@ void itree_recorrer_bfs(AVLTree arbol) {
 
 
 int main() {
+
+  //AVLTree arbol = NULL;
   AVLTree arbol = NULL;
   // Creacion
   for(double i=1; i < 16; i++){
@@ -298,25 +254,30 @@ int main() {
   aux->inicio = 1;
   aux->final = 2;
   itree_eliminar(arbol, aux);
-  inorder(arbol);
+  //inorder(arbol);
 
   Intervalo* aux2 = (Intervalo*)malloc(sizeof(Intervalo));
   aux2->inicio = 2;
   aux2->final = 3;
   itree_eliminar(arbol, aux2);
-  inorder(arbol);
+  //inorder(arbol);
 
   Intervalo* aux3 = (Intervalo*)malloc(sizeof(Intervalo));
   aux3->inicio = 14;
   aux3->final = 15;
   itree_eliminar(arbol, aux3);
-  inorder(arbol);
+  //inorder(arbol);
 
   Intervalo* aux4 = (Intervalo*)malloc(sizeof(Intervalo));
   aux4->inicio = 14;
   aux4->final = 15;
   itree_insertar(arbol, aux4);
-  inorder(arbol);
+  //inorder(arbol);
 
-  //itree_recorrer_dfs(arbol);
+  inorder(arbol);
+  itree_recorrer_bfs(arbol);
+  puts("");
+  itree_recorrer_dfs(arbol);
+
 }
+
