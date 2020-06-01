@@ -9,38 +9,42 @@
 
 //-itree crear ✔️
   // * Implementar ✔️
-//-itree destruir
-  // * Implementar
 
-//-itree insertar
-  // * Analizar que pasa con el segundo valor (ver en itree_destruir)
-  // * Ver si se puede unir la parte de recorrer el arbol con eliminar y intersecar ///
+//-itree destruir✔️
+  // * Implementar ✔️
+  // * Checkear que no haya filtraciones de memoria
 
-//-itree eliminar
-  // * Falta liberar la memoria del nodo y el puntero de su padre que apunta a el✔️
-  // * Ver si se puede unir la parte de recorrer el arbol con insertar e intersecar ///
+// * Unir el recorrer de insertar y eliminar en uno por funcion
 
-// itree intersectar
-  // * Implementar
-  // * Ver si se puede unir la parte de recorrer el arbol con insertar y eliminar ///
-  // * Testear su funcionamiento
+//-itree insertar✔️
+  // * Analizar que pasa con el segundo valor (ver en itree_destruir) ✔️
 
-// itree recorrer dfs ❓
+//-itree eliminar✔️
+  // * Falta liberar la memoria del nodo y el puntero de su padre que apunta a el ✔️
 
-// itree recorrer bfs ❓
+// itree intersetar✔️
+  // * Implementar ✔️
+  // * Testear su funcionamiento ✔️
 
-// mayorFinal (AVLNodo)
-  // * Darle uso
-  // * Adaptar insertar y eliminar para que la modifiquen
+// itree recorrer dfs ✔️
+  // * Checkear que no haya filtraciones de memoria
+
+// itree recorrer bfs ✔️
+  // * Checkear que no haya filtraciones de memoria
+
+// mayorFinal (AVLNodo) ✔️
+  // * Usarla para la busqueda ✔️
+  // * Usarlo para no revisar el arbol si el mayorTotal es menor al inicial del dato ✔️
 
 // Interfaz
   // * Hacerla (main)
+  // * Crear intervalo
 
-// Queue y Stack
-  // * Ver tema crecimiento dinamico
+// Queue y Stack ✔️
+  // * Ver tema crecimiento dinamico ✔️
   // * Mejorar escritura✔️
 
-// inodo_liberar
+// inodo_liberar✔️
   // * Implementar ✔️
   // * Ver si no filtramos memoria
   
@@ -53,7 +57,7 @@
 // Informe
   // * Hacer
 
-
+// * Ver si no filtramos memoria en los que tiene la tag
 typedef struct _Intervalo {
     double inicio;
     double final;
@@ -70,12 +74,24 @@ typedef struct _AVLNodo {
 typedef AVLNodo *AVLTree;
 
 
+int max(int a, int b) {
+    if(a > b)
+        return a;
+    return b;
+}
+
+
+double max_double(double a, double b) {
+    if(a > b)
+        return a;
+    return b;
+}
 // Funciones auxiliares
 
 int obtener_altura(AVLTree arbol) {
-    if (arbol)
-        return arbol->altura;
-    return 0;
+  if (arbol)
+    return arbol->altura;
+  return 0;
 }
 
 int obtener_balance(AVLTree arbol){
@@ -84,10 +100,17 @@ int obtener_balance(AVLTree arbol){
   return 0;
 }
 
-int max(int a, int b) {
-    if(a > b)
-        return a;
-    return b;
+
+double obtener_mayorFinal(AVLTree arbol){
+  if(arbol->der == NULL || arbol->izq == NULL){
+    AVLTree temp = arbol->izq ? arbol->izq : arbol->der;
+      // Sin hijos
+    if(temp == NULL)
+      return arbol->dato->final;
+    else // Caso un hijo
+      return max_double(arbol->dato->final, temp->mayorFinal);
+  } else
+    return max_double(arbol->dato->final, max_double(arbol->izq->mayorFinal, arbol->der->mayorFinal));
 }
 
 // Funciones de rotacion
@@ -99,6 +122,7 @@ AVLTree rotar_derecha(AVLTree arbol) {
     copArbolIzq->der = arbol;
     // Recalculamos altura
     arbol->altura = max(obtener_altura(arbol->izq), obtener_altura(arbol->der)) + 1;
+    arbol->mayorFinal = obtener_mayorFinal(arbol);
     copArbolIzq->altura = max(obtener_altura(copArbolIzq->izq), obtener_altura(copArbolIzq->der)) + 1;
     // Se retorna el nuevo primer nodoz
     printf("Roto derecha\n");
@@ -113,6 +137,7 @@ AVLTree rotar_izquierda(AVLTree arbol) {
     copArbolDer->izq = arbol;
     // Recalculamos altura
     arbol->altura = max(obtener_altura(arbol->izq), obtener_altura(arbol->der)) + 1;
+    arbol->mayorFinal = obtener_mayorFinal(arbol);
     copArbolDer->altura = max(obtener_altura(copArbolDer->izq), obtener_altura(copArbolDer->der)) + 1;
     // Se retorna el nuevo primer nodo
     printf("Roto izquierda\n");
@@ -152,7 +177,7 @@ AVLTree inodo_crear(Intervalo *dato) {
     nodo->der = NULL;
     nodo->izq = NULL;
     nodo->altura = 1;
-    nodo->mayorFinal = 0;
+    nodo->mayorFinal = dato->final;
     nodo->dato = dato;
     return nodo;
 }
@@ -164,22 +189,69 @@ AVLTree itree_insertar(AVLTree arbol, Intervalo *dato) {
     }
     // Buscamos la posicion que debe ocupar el nuevo nodo
     // segun BST
-    if (dato->inicio > arbol->dato->inicio)
-        arbol->der = itree_insertar(arbol->der, dato);
-    else if (dato->inicio < arbol->dato->inicio)
-        arbol->izq = itree_insertar(arbol->izq, dato);
+    if(dato->inicio < arbol->dato->inicio)
+      arbol->izq = itree_insertar(arbol->izq, dato);
+    else if(dato->inicio > arbol->dato->inicio)
+      arbol->der = itree_insertar(arbol->der, dato); //TODO El recorrido izq / der se puede hacer aparte
+    else if(dato->final < arbol->dato->final)
+      arbol->izq = itree_insertar(arbol->izq, dato);
+    else if(dato->final > arbol->dato->final)
+      arbol->der = itree_insertar(arbol->der, dato);
     // Caso en el que el nodo ya este en el arbol
     else
         return arbol;
     // Recalculamos la altura de cada nuevo nodo
     arbol->altura = 1 + max(obtener_altura(arbol->izq), obtener_altura(arbol->der));
+    arbol->mayorFinal = obtener_mayorFinal(arbol);
     // Calculamos el valor de balance de el nodo y procedemos a balancear correctamente
     int balance = obtener_balance(arbol);
     return balancear(arbol, balance);
 }
 
 // Funciones comparacion
-AVLTree itree_intersectar(){}
+
+int inodo_interseccion(Intervalo* datoArbol, Intervalo* dato){
+  if(datoArbol->inicio <= dato->final && datoArbol->final >= dato->inicio)
+    return 1;
+  return 0;
+}
+
+AVLTree itree_intersecar(AVLTree arbol, Intervalo* dato){
+  // Si llegue a NULL, retorno
+  if(arbol == NULL)
+    return arbol;
+  // Si se encontro interseccion, devuelvo ese nodo 
+  if(inodo_interseccion(arbol->dato, dato))
+    return arbol;
+  // si el intervalo es menor que el del nodo, obligatoriamente la
+  // interseccion ocurrira en el subarbol izquierdo
+
+  // si el dato es menor al nodo:
+  if(dato->final < arbol->dato->inicio)
+    // Si el mayor de los descendientes de la izquierda es mayor que el dato,
+    // hago recursion ya que puede ser que haya interseccion en el mismo
+    if(arbol->izq != NULL && arbol->izq->mayorFinal >= dato->inicio)
+      return itree_intersecar(arbol->izq, dato);
+    // Si es menor, no hay forma que haya interseccion.
+    else
+      return NULL;
+  
+  // si el dato es mayor al nodo:
+  // Si el mayor de los descendientes de la izquierda es mayor que el dato,
+  // se que si o si hay una interseccion a la izquierda, asi que la busco 
+  if(arbol->izq != NULL && arbol->izq->mayorFinal >= dato->inicio)
+    return itree_intersecar(arbol->izq, dato);
+  // En caso contrario, la interseccion puede llegar 
+  // a ocurrir a la derecha solamente
+  else
+    // Si el mayor del arbol es menor que el dato
+    // ya se que no habra interseccion
+    if(arbol->mayorFinal < dato->inicio)
+      return NULL;
+    // sino, finalmente hago recursion por la derecha
+    else
+      return itree_intersecar(arbol->der, dato);
+}
 
 // Funciones destrucción
 void inodo_liberar(AVLTree arbol) {
@@ -235,7 +307,7 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo *dato){
 
   // Actualizo la altura si es necesaria
   arbol->altura = 1 + max(obtener_altura(arbol->der), obtener_altura(arbol->izq));
-
+  arbol->mayorFinal = obtener_mayorFinal(arbol);
   // Calculo el balance del nodo
   int balance = obtener_balance(arbol);
 
@@ -244,14 +316,20 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo *dato){
 }
 
 
-AVLTree itree_destruir(){}
+void itree_destruir(AVLTree arbol){
+  if(arbol->der != NULL)
+    itree_destruir(arbol->der);
+  if(arbol->izq != NULL)
+    itree_destruir(arbol->izq);
+  inodo_liberar(arbol);
+}
 
 // Funciones recorrer
 void inorder(AVLTree arbol) {
   if(arbol == NULL)
     return;
   inorder(arbol->izq);
-  printf("[%f, %f]-%d\n", arbol->dato->inicio, arbol->dato->final, arbol->altura);
+  printf("[%f, %f] - maximo: %f altura:%d\n", arbol->dato->inicio, arbol->dato->final, arbol->mayorFinal, arbol->altura);
   inorder(arbol->der);
 }
 
@@ -291,41 +369,24 @@ int main() {
   //AVLTree arbol = NULL;
   AVLTree arbol = NULL;
   // Creacion
-  for(double i=1; i < 16; i++){
+  for(double i=1; i < 30; i=i+2){
     Intervalo* aux = (Intervalo*)malloc(sizeof(Intervalo));
     aux->inicio = i;
-    aux->final = i+1;
+    if (i == 13){
+      aux->final = 400;
+    }else{
+      aux->final = i+1;
+    }
     arbol = itree_insertar(arbol, aux);
   }
   // Eliminacion
-  Intervalo* aux = (Intervalo*)malloc(sizeof(Intervalo));
-  aux->inicio = 1;
-  aux->final = 2;
-  itree_eliminar(arbol, aux);
-  //inorder(arbol);
-
-  Intervalo* aux2 = (Intervalo*)malloc(sizeof(Intervalo));
-  aux2->inicio = 2;
-  aux2->final = 3;
-  itree_eliminar(arbol, aux2);
-  //inorder(arbol);
-
-  Intervalo* aux3 = (Intervalo*)malloc(sizeof(Intervalo));
-  aux3->inicio = 14;
-  aux3->final = 15;
-  itree_eliminar(arbol, aux3);
-  //inorder(arbol);
-
-  Intervalo* aux4 = (Intervalo*)malloc(sizeof(Intervalo));
-  aux4->inicio = 14;
-  aux4->final = 15;
-  itree_insertar(arbol, aux4);
-  //inorder(arbol);
-
   inorder(arbol);
   itree_recorrer_bfs(arbol);
   puts("");
   itree_recorrer_dfs(arbol);
 
+  
+  
+  
 }
 
