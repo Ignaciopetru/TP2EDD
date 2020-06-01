@@ -1,5 +1,5 @@
-#ifndef QUEUE_H_INLCUDED
-#define QUEUE_H_INLCUDED
+#ifndef QUEUE_H_INCLUDED
+#define QUEUE_H_INCLUDED
 
 // Tipo de la queue
 typedef struct _Queue* Queue;

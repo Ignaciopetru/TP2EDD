@@ -1,16 +1,19 @@
-all: dlist.o queue.o stack.o main
+all: main
 
-main: stack.o queue.o main.c dlist.o
-	gcc -o main -g main.c stack.o queue.o dlist.o -lm
+main: main.c stack.o queue.o dlist.o avltree.o
+	gcc -o main main.c avltree.o stack.o queue.o dlist.o -lm
 
-stack.o: lists/stack.c lists/stack.h 
-	gcc -c -Wall -Wextra -Werror -g lists/stack.c
+avltree.o: avltree.c avltree.h stack.o queue.o dlist.o
+	gcc -c -Wall -Wextra -Werror avltree.c
 
-queue.o: lists/queue.c lists/queue.h
-	gcc -c -Wall -Wextra -Werror -g lists/queue.c
+stack.o: lists/stack.c lists/stack.h dlist.o
+	gcc -c -c -Wall -Wextra -Werror lists/stack.c
+
+queue.o: lists/queue.c lists/queue.h dlist.o
+	gcc -c -c -Wall -Wextra -Werror lists/queue.c
 
 dlist.o: lists/dlist/dlist.c lists/dlist/dlist.h
-	gcc -c -c -Wall -Wextra -Werror -g lists/dlist/dlist.c
+	gcc -c -c -Wall -Wextra -Werror lists/dlist/dlist.c
 
 clean:
 	rm *.o
