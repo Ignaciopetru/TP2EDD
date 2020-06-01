@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "avltree.h"
 #include "lists/queue.h"
 #include "lists/stack.h"
@@ -61,6 +62,42 @@
 
 
 int main() {
+
+  printf("Interface v0.01");
+  char * codigo = malloc(sizeof(1024));
+  codigo = fgets(codigo, 1024, stdin);
+  int largo = strlen(codigo);
+  codigo = realloc(codigo, sizeof(char)*largo);
+  printf("%s", codigo);
+  char primerLetra = codigo[0];
+
+  switch (primerLetra){
+    case 'd':
+      printf("DFS");
+      break;
+    case 'b':
+      printf("BFS");
+      break;
+    case 's':
+      printf("SALIR");
+      break;
+    case 'i':
+      int i;
+      for (i = 0; codigo[i]; i++) {
+
+      }
+      break;
+    
+    default:
+      break;
+  }
+
+
+
+
+
+
+
   //AVLTree arbol = NULL;
   AVLTree arbol = NULL;
   // Creacion
