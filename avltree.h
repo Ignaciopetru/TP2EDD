@@ -1,12 +1,21 @@
 #ifndef AVLTREE_H_INCLUDED
 #define AVLTREE_H_INCLUDED
 
-typedef struct _AVLNodo *AVLTree;
 
 typedef struct _Intervalo {
     double inicio;
     double final;
 }Intervalo;
+
+typedef struct _AVLNodo {
+    Intervalo *intervalo;
+    int altura;
+    double mayorFinal;
+    struct _AVLNodo *der;
+    struct _AVLNodo *izq;
+}*AVLTree;
+
+
 
 AVLTree itree_crear();
 

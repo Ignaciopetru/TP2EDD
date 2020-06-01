@@ -5,17 +5,6 @@
 #include "lists/queue.h"
 #include "lists/stack.h"
 
-
-
-
-struct _AVLNodo {
-    Intervalo *intervalo;
-    int altura;
-    double mayorFinal;
-    struct _AVLNodo *der;
-    struct _AVLNodo *izq;
-};
-
 // Funciones auxiliares
 
 int max(int a, int b) {

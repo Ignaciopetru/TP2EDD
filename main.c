@@ -63,33 +63,52 @@
 
 int main() {
 
-  printf("Interface v0.01");
-  char * codigo = malloc(sizeof(1024));
-  codigo = fgets(codigo, 1024, stdin);
-  int largo = strlen(codigo);
-  codigo = realloc(codigo, sizeof(char)*largo);
-  printf("%s", codigo);
-  char primerLetra = codigo[0];
-
-  switch (primerLetra){
-    case 'd':
-      printf("DFS");
-      break;
-    case 'b':
-      printf("BFS");
-      break;
-    case 's':
-      printf("SALIR");
-      break;
-    case 'i':
-      int i;
-      for (i = 0; codigo[i]; i++) {
-
+  AVLTree arbol = itree_crear();
+  printf("Interface v0.01\n");
+  int salida = 0;
+  while (!salida) {
+    char * codigo = malloc(sizeof(1024));
+    codigo = fgets(codigo, 1024, stdin);
+    int largo = strlen(codigo);
+    codigo = realloc(codigo, sizeof(char)*largo);
+    char primerLetra = codigo[0];
+  
+    switch (primerLetra){
+      case 'd':
+        itree_recorrer_dfs(arbol);
+        break;
+      case 'b':
+        itree_recorrer_bfs(arbol);
+        break;
+      case 's':
+        salida = 1;
+        break;
+      case 'i':{
+        Intervalo * intervalo = malloc(sizeof(Intervalo));
+        sscanf(codigo, "%*s [%lf, %lf]", &(intervalo->inicio), &(intervalo->final));
+        arbol = itree_insertar(arbol, intervalo);
+        printf("Nodo insetado");
+        break;
       }
-      break;
-    
-    default:
-      break;
+      case 'e':{
+        Intervalo * intervalo = malloc(sizeof(Intervalo));
+        sscanf(codigo, "%*s [%lf, %lf]", &(intervalo->inicio), &(intervalo->final));
+        itree_eliminar(arbol, intervalo, 0);
+        break;
+      }
+      case '?':{
+        Intervalo * intervalo = malloc(sizeof(Intervalo));
+        sscanf(codigo, "%*s [%lf, %lf]", &(intervalo->inicio), &(intervalo->final));
+        AVLTree nodo = itree_intersecar(arbol, intervalo);
+        printf("[%lf, %lf]", nodo->intervalo->inicio, nodo->intervalo->final);
+        break;
+      }
+
+      
+      default:
+        break;
+    }
+    free(codigo);
   }
 
 
@@ -97,7 +116,7 @@ int main() {
 
 
 
-
+/*
   //AVLTree arbol = NULL;
   AVLTree arbol = NULL;
   // Creacion
@@ -126,7 +145,7 @@ int main() {
   puts("");
   //itree_recorrer_dfs(arbol);
   itree_destruir(arbol);
-
+*/
   
 }
 
