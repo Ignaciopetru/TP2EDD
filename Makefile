@@ -17,3 +17,4 @@ dlist.o: lists/dlist/dlist.c lists/dlist/dlist.h
 
 clean:
 	rm *.o
+	rm main
