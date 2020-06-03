@@ -5,6 +5,7 @@
 #include "avltree.h"
 #include "lists/queue.h"
 #include "lists/stack.h"
+#define MAX_ERROR 200
 
 
 //TODO
@@ -60,6 +61,35 @@
 // * Ver si no filtramos memoria en los que tiene la tag ✔️
 
 
+Intervalo* entrada_validar (char *codigo) {
+  
+  char *funcion = malloc(sizeof(char)*MAX_ERROR);
+  char *errorNuCor = malloc(sizeof(char)*MAX_ERROR);
+  char *errorFinal = malloc(sizeof(char)*MAX_ERROR);
+  double inicio = 0, final = 0;
+  int argCorrectos = sscanf(codigo, "%s [ %lf , %lf %[^]]]", funcion, &inicio, &final, errorNuCor);
+  
+  sscanf(strstr(codigo, "]"), "] %[^\r\n]\n", errorFinal);
+
+  if (argCorrectos == 3 && strcmp(errorNuCor, "") == 0 && strcmp(errorFinal, "") == 0 && (strcmp(funcion, "i ") ||strcmp(funcion, "e ")||strcmp(funcion, "? "))) {
+    if (inicio <= final) {
+      Intervalo * intervalo = malloc(sizeof(Intervalo));
+      intervalo->inicio = inicio;
+      intervalo->final = final;
+      free(funcion);
+      free(errorNuCor);
+      return intervalo;
+    }
+    else
+      printf("El intervalo es invalido\n");
+  } else {
+    printf("El comando esta mal escrito\n");
+    free(funcion);
+    free(errorNuCor);
+    return NULL;
+  }
+}
+
 
 int main() {
 
@@ -71,23 +101,38 @@ int main() {
     codigo = fgets(codigo, 1024, stdin);
     int largo = strlen(codigo);
     codigo = realloc(codigo, sizeof(char)*largo);
+
     char primerLetra = codigo[0];
   
     switch (primerLetra){
       case 'd':
-        itree_recorrer_dfs(arbol);
+        if (strcmp(codigo, "dfs\n") == 0)
+          itree_recorrer_dfs(arbol, (Visitante) intervalo_imprimir);
+        else
+          printf("Quiso escribir dfs? Intente nuevamente.\n");
         break;
       case 'b':
-        itree_recorrer_bfs(arbol);
+        if (strcmp(codigo, "bfs\n") == 0)
+          itree_recorrer_bfs(arbol, (Visitante) intervalo_imprimir);
+        else
+          printf("Quiso escribir bfs? Intente nuevamente.\n");
         break;
       case 's':
-        salida = 1;
+        if (strcmp(codigo, "salir\n") == 0){
+          salida = 1;
+          printf("Saliendo del programa.\n");
+        }
+        else
+          printf("Quiso escribir salir? Intente nuevamente.\n");
         break;
       case 'i':{
-        Intervalo * intervalo = malloc(sizeof(Intervalo));
-        sscanf(codigo, "%*s [%lf, %lf]", &(intervalo->inicio), &(intervalo->final));
+        Intervalo * intervalo = entrada_validar(codigo);
+        if (intervalo == NULL)
+          break;
         arbol = itree_insertar(arbol, intervalo);
-        printf("Nodo insetado");
+        printf("Nodo: ");
+        intervalo_imprimir(intervalo);
+        printf("Insertado\n");
         break;
       }
       case 'e':{
@@ -103,13 +148,13 @@ int main() {
         printf("[%lf, %lf]", nodo->intervalo->inicio, nodo->intervalo->final);
         break;
       }
-
-      
       default:
+        printf("Comando invalido, intente nuevamente");
         break;
     }
     free(codigo);
   }
+  itree_destruir(arbol);
 
 
 

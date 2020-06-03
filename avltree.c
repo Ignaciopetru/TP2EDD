@@ -267,11 +267,11 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo *dato, int bandera){
 }
 
 void itree_destruir(AVLTree arbol){
-  if (arbol->der != NULL)
+  if(arbol != NULL){
     itree_destruir(arbol->der);
-  if (arbol->izq != NULL)
     itree_destruir(arbol->izq);
-  inodo_liberar(arbol);
+    inodo_liberar(arbol);
+  }
 }
 
 // Funciones recorrer
@@ -284,14 +284,15 @@ void inorder(AVLTree arbol) {
   inorder(arbol->der);
 }
 
-void itree_recorrer_dfs(AVLTree arbol) {
+void itree_recorrer_dfs(AVLTree arbol, Visitante visitante) {
   Stack stack = stack_new();
   stack_push(stack, arbol);
   while (!stack_isEmpty(stack)) {
     AVLTree nodo = stack_top(stack);
     stack_pop(stack);
     if (nodo != NULL) {
-      printf("[%f, %f]\n", nodo->intervalo->inicio, nodo->intervalo->final);
+      visitante(nodo->intervalo);
+      //printf("[%f, %f]\n", nodo->intervalo->inicio, nodo->intervalo->final);
       stack_push(stack, nodo->der);
       stack_push(stack, nodo->izq);
     }
@@ -299,16 +300,21 @@ void itree_recorrer_dfs(AVLTree arbol) {
   stack_destruir(stack);
 }
 
-void itree_recorrer_bfs(AVLTree arbol) {
+void itree_recorrer_bfs(AVLTree arbol, Visitante visitante) {
   Queue queue = queue_new();
   queue_agregar(queue, arbol);
   while (!queue_isEmpty(queue)) {
     AVLTree nodo = queue_sacar(queue);
     if (nodo != NULL) {
-      printf("[%f, %f]\n", nodo->intervalo->inicio, nodo->intervalo->final);
+      visitante(nodo->intervalo);
+      //printf("[%f, %f]\n", nodo->intervalo->inicio, nodo->intervalo->final);
       queue_agregar(queue, nodo->izq);
       queue_agregar(queue, nodo->der);
     }
   }
   queue_destruir(queue);
+}
+
+void intervalo_imprimir(Intervalo *intervalo) {
+  printf("[%f, %f]\n", intervalo->inicio, intervalo->final);
 }

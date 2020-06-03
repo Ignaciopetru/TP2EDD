@@ -15,7 +15,7 @@ typedef struct _AVLNodo {
     struct _AVLNodo *izq;
 }*AVLTree;
 
-
+typedef void (*Visitante) (Intervalo *);
 
 AVLTree itree_crear();
 
@@ -27,8 +27,10 @@ AVLTree itree_intersecar(AVLTree, Intervalo *);
 
 AVLTree itree_eliminar(AVLTree, Intervalo *, int);
 
-void itree_recorrer_dfs(AVLTree);
+void itree_recorrer_dfs(AVLTree, Visitante);
 
-void itree_recorrer_bfs(AVLTree);
+void itree_recorrer_bfs(AVLTree, Visitante);
+
+void intervalo_imprimir(Intervalo *);
 
 #endif
