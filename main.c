@@ -86,7 +86,6 @@ Intervalo* entrada_validar (char *codigo) {
       intervalo->final = final;
       // Se liberan auxiliares.
       free(funcion);
-      free(errorFinal);
       free(errorNuCor);
       return intervalo;
     }
@@ -94,14 +93,12 @@ Intervalo* entrada_validar (char *codigo) {
     // Si el intervalo no tiene sentido se le notifica al usuario.
       printf("El intervalo es invalido\n");
       free(funcion);
-      free(errorFinal);
       free(errorNuCor);
       return NULL;
   } else {
     // Si el intervalo no tiene sentido se le notifica al usuario.
     printf("El comando esta mal escrito\n");
     free(funcion);
-    free(errorFinal);
     free(errorNuCor);
     return NULL;
   }
@@ -155,7 +152,7 @@ int main() {
       case 'e':{
         Intervalo * intervalo = malloc(sizeof(Intervalo));
         sscanf(codigo, "%*s [%lf, %lf]", &(intervalo->inicio), &(intervalo->final));
-        itree_eliminar(arbol, intervalo, 0);
+        arbol = itree_eliminar(arbol, intervalo, 0);
         break;
       }
       case '?':{
