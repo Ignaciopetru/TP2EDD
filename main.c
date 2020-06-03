@@ -60,116 +60,180 @@
 
 // * Ver si no filtramos memoria en los que tiene la tag ✔️
 
+int intervalo_verificar(char *inicio, char *final, Intervalo *intervalo) {
+  char *errorI;
+  double inicioD = strtod(inicio, &errorI);
+  char *errorF;
+  double finalD = strtod(final, &errorF);
+  
+  if (strcmp(errorI, "") != 0 || strcmp(errorF, "") != 0)
+    return 0;
+  if (finalD < inicioD)
+    return 0;
+  intervalo->inicio = inicioD;
+  intervalo->final = finalD;
+  return 1;
+}
 
-Intervalo* entrada_validar (char *codigo) {
-  // funcion almacena la primer parte del comando.
-  char *funcion = malloc(sizeof(char)*MAX_ERROR);
-  // errorNuCor almacena los posibles caracteres entre el segundo double y el ultimo corchete. 
-  char *errorNuCor = malloc(sizeof(char)*MAX_ERROR);
-  // errorFinal almacena los posibles caracteres luedo del ultimo corchete.
-  char *errorFinal = malloc(sizeof(char)*MAX_ERROR);
-  // inicio, final almacenan auxiliarmente los datos correspondientes al intervalo.
-  double inicio = 0, final = 0;
-  // Con sscanf leemos la estructura del comando ingresado, y almacenamos la cantidad de argumentos correctos. 
-  int argCorrectos = sscanf(codigo, "%s [ %lf , %lf %[^]]]", funcion, &inicio, &final, errorNuCor);
-  // Buscamos la posicion del ultimo ] para testear que no haya caracteres de mas.
-  sscanf(strstr(codigo, "]"), "] %[^\r\n]\n", errorFinal);
 
-  // Testeamos que el comando cumpla con los parametros impuestos.
-  if (argCorrectos == 3 && strcmp(errorNuCor, "") == 0 && strcmp(errorFinal, "") == 0 && (strcmp(funcion, "i ") ||strcmp(funcion, "e ")||strcmp(funcion, "? "))) {
-  // Si el codigo tiene la sintaxis valida: 
-    // Se testea que el intervalo tenga sentido
-    if (inicio <= final) {
-      // Resiervamos memoria para la estructura intervalo.
-      Intervalo *intervalo = malloc(sizeof(Intervalo));
-      intervalo->inicio = inicio;
-      intervalo->final = final;
-      // Se liberan auxiliares.
-      free(funcion);
-      free(errorNuCor);
-      return intervalo;
-    }
+// error 1 = no corresponde a una funcion
+// error 2 = intervalo invalido
+// error 3 = existe residuo
+char funcion_verificar(char *ident, char *inicio, char *final, char *residuo, Intervalo *intervalo) {
+  // Chequeamos si existe residuo luego del ultimo ]
+  if (strcmp(residuo, "") != 0)
+    return '3';
+  // Si no hay residuo y el identificador corresponde a un funcion con intervalo:
+  if ((ident[0] == 'i' || ident[0] == 'e' || ident[0] == '?') && strlen(ident) == 2 && ident[1] == ' ') {
+    // Verificamos que el intervalo sea valido:
+    if (intervalo_verificar(inicio, final, intervalo))
+      // Si es valido retorneamos el identificador
+      return ident[0];
+      // Sino codigo de error.
     else
-    // Si el intervalo no tiene sentido se le notifica al usuario.
-      printf("El intervalo es invalido\n");
-      free(funcion);
-      free(errorNuCor);
-      return NULL;
+      return '2';
   } else {
-    // Si el intervalo no tiene sentido se le notifica al usuario.
-    printf("El comando esta mal escrito\n");
-    free(funcion);
-    free(errorNuCor);
-    return NULL;
+    // Si el identificador no corresponde a funciones con intervalo, comprobamos las restantes
+    if (strcmp(ident, "dfs") == 0  || strcmp(ident, "bfs") == 0  || strcmp(ident, "salir") == 0)
+      return ident[0];
   }
+  // No corresponde a ninguna funcion valida
+  return '1';
+}
+
+char entrada_validar (char *comando, Intervalo *intervalo) {
+  int i, indexToken = 0, cont = 0;
+  char *ident = calloc(1, sizeof(char)*50);
+  char *inicio = calloc(1, sizeof(char)*50);
+  char *final = calloc(1, sizeof(char)*50);
+  char *residuo = calloc(1, sizeof(char)*50);
+  for(i = 0; comando[i] != '\n' && comando[i] != '\r' ; i++) {
+    // Copiamos residuo
+    if (indexToken == 3) 
+      residuo[cont] = comando[i];
+
+    // Copiamos final
+    if (indexToken == 2) {
+      if (comando[i] == ']'){
+        indexToken = 3;
+        cont = -1;
+      }
+      else
+        final[cont] = comando[i];
+    }
+
+    // Copiamos inicio
+    if (indexToken == 1) {
+      if (comando[i] == ','){
+        indexToken = 2;
+        cont = -1;
+      }
+      else
+        inicio[cont] = comando[i];
+    }
+
+    // Copiamos el identificador hasta encontrar la llave.
+    if (indexToken == 0) {
+      if (comando[i] == '['){
+        indexToken = 1;
+        cont = -1;
+      }
+      else
+        ident[cont] = comando[i];
+    }
+    // Aumentamos contador de letras.
+    cont++;
+
+  }
+  residuo[cont] = '\0';
+  char primeraLetra = funcion_verificar(ident, inicio, final, residuo, intervalo);
+  free(ident);
+  free(inicio);
+  free(final);
+  free(residuo);
+
+  return primeraLetra;
+
 }
 
 
 int main() {
 
+  int salida = 1;
   AVLTree arbol = itree_crear();
-  printf("Interface v0.01\n");
-  int salida = 0;
-  while (!salida) {
-    char * codigo = malloc(sizeof(1024));
-    codigo = fgets(codigo, 1024, stdin);
-    int largo = strlen(codigo);
-    codigo = realloc(codigo, sizeof(char)*largo);
+  printf("Sea BIENVENIDO\n");
+  while (salida) {
+    char *comando = malloc(sizeof(char) * 200);
+    // leemos con \n incluido
+    fgets(comando, 200, stdin);
+    
+    comando = realloc(comando, sizeof(char) * strlen(comando));
+    
+    Intervalo *intervalo = malloc(sizeof(Intervalo));
+    char identificador = entrada_validar(comando, intervalo);
+    
+    free(comando);
+    
+    switch (identificador)
+    {
+    case 'i':
+      arbol = itree_insertar(arbol, intervalo);
+      break;
 
-    char primerLetra = codigo[0];
-  
-    switch (primerLetra){
-      case 'd':
-        if (strcmp(codigo, "dfs\n") == 0)
-          itree_recorrer_dfs(arbol, (Visitante) intervalo_imprimir);
-        else
-          printf("Quiso escribir dfs? Intente nuevamente.\n");
-        break;
-      case 'b':
-        if (strcmp(codigo, "bfs\n") == 0)
-          itree_recorrer_bfs(arbol, (Visitante) intervalo_imprimir);
-        else
-          printf("Quiso escribir bfs? Intente nuevamente.\n");
-        break;
-      case 's':
-        if (strcmp(codigo, "salir\n") == 0){
-          salida = 1;
-          printf("Saliendo del programa.\n");
-        }
-        else
-          printf("Quiso escribir salir? Intente nuevamente.\n");
-        break;
-      case 'i':{
-        Intervalo * intervalo = entrada_validar(codigo);
-        if (intervalo == NULL)
-          break;
-        arbol = itree_insertar(arbol, intervalo);
-        printf("Nodo: ");
-        intervalo_imprimir(intervalo);
-        printf("Insertado\n");
-        break;
+    case 'e':
+      arbol = itree_eliminar(arbol, intervalo, 0);
+      free(intervalo);
+      break;
+
+    case '?':{
+      AVLTree inter = itree_intersecar(arbol, intervalo);
+      if (inter == NULL)
+        printf("NO\n");
+      else{
+        printf("SI: ");
+        intervalo_imprimir(inter->intervalo);      
       }
-      case 'e':{
-        Intervalo * intervalo = malloc(sizeof(Intervalo));
-        sscanf(codigo, "%*s [%lf, %lf]", &(intervalo->inicio), &(intervalo->final));
-        arbol = itree_eliminar(arbol, intervalo, 0);
-        break;
-      }
-      case '?':{
-        Intervalo * intervalo = malloc(sizeof(Intervalo));
-        sscanf(codigo, "%*s [%lf, %lf]", &(intervalo->inicio), &(intervalo->final));
-        AVLTree nodo = itree_intersecar(arbol, intervalo);
-        printf("[%lf, %lf]", nodo->intervalo->inicio, nodo->intervalo->final);
-        break;
-      }
-      default:
-        printf("Comando invalido, intente nuevamente");
-        break;
+      free(intervalo);
+      break;
     }
-    free(codigo);
-  }
-  itree_destruir(arbol);
+    case 'd':
+      itree_recorrer_dfs(arbol, intervalo_imprimir);
+      free(intervalo);
+      break;
 
+    case 'b':
+      itree_recorrer_bfs(arbol, intervalo_imprimir);
+      free(intervalo);
+      break;
+
+    case 's':
+      printf("Saliendo del progrema\n");
+      free(intervalo);
+      salida = 0;
+      break;
+
+    case '1':
+      printf("ERROR-Funcion invalida!\n");
+      free(intervalo);
+      break;
+
+    case '2':
+      printf("ERROR-Intervalo invalido!\n");
+      free(intervalo);
+      break;
+
+    case '3':
+      printf("ERROR-Caracteres irreconocibles tras ']'!\n");
+      free(intervalo);
+      break;
+
+    default:
+      free(intervalo);
+      break;
+    }
+  }
+
+  itree_destruir(arbol);
 
 
 
@@ -205,6 +269,6 @@ int main() {
   //itree_recorrer_dfs(arbol);
   itree_destruir(arbol);
 */
-  
+  return 0;
 }
 
