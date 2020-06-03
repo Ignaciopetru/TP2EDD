@@ -62,29 +62,46 @@
 
 
 Intervalo* entrada_validar (char *codigo) {
-  
+  // funcion almacena la primer parte del comando.
   char *funcion = malloc(sizeof(char)*MAX_ERROR);
+  // errorNuCor almacena los posibles caracteres entre el segundo double y el ultimo corchete. 
   char *errorNuCor = malloc(sizeof(char)*MAX_ERROR);
+  // errorFinal almacena los posibles caracteres luedo del ultimo corchete.
   char *errorFinal = malloc(sizeof(char)*MAX_ERROR);
+  // inicio, final almacenan auxiliarmente los datos correspondientes al intervalo.
   double inicio = 0, final = 0;
+  // Con sscanf leemos la estructura del comando ingresado, y almacenamos la cantidad de argumentos correctos. 
   int argCorrectos = sscanf(codigo, "%s [ %lf , %lf %[^]]]", funcion, &inicio, &final, errorNuCor);
-  
+  // Buscamos la posicion del ultimo ] para testear que no haya caracteres de mas.
   sscanf(strstr(codigo, "]"), "] %[^\r\n]\n", errorFinal);
 
+  // Testeamos que el comando cumpla con los parametros impuestos.
   if (argCorrectos == 3 && strcmp(errorNuCor, "") == 0 && strcmp(errorFinal, "") == 0 && (strcmp(funcion, "i ") ||strcmp(funcion, "e ")||strcmp(funcion, "? "))) {
+  // Si el codigo tiene la sintaxis valida: 
+    // Se testea que el intervalo tenga sentido
     if (inicio <= final) {
-      Intervalo * intervalo = malloc(sizeof(Intervalo));
+      // Resiervamos memoria para la estructura intervalo.
+      Intervalo *intervalo = malloc(sizeof(Intervalo));
       intervalo->inicio = inicio;
       intervalo->final = final;
+      // Se liberan auxiliares.
       free(funcion);
+      free(errorFinal);
       free(errorNuCor);
       return intervalo;
     }
     else
+    // Si el intervalo no tiene sentido se le notifica al usuario.
       printf("El intervalo es invalido\n");
+      free(funcion);
+      free(errorFinal);
+      free(errorNuCor);
+      return NULL;
   } else {
+    // Si el intervalo no tiene sentido se le notifica al usuario.
     printf("El comando esta mal escrito\n");
     free(funcion);
+    free(errorFinal);
     free(errorNuCor);
     return NULL;
   }
