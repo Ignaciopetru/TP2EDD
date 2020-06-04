@@ -5,12 +5,7 @@
 #include "avltree.h"
 #include "lists/queue.h"
 #include "lists/stack.h"
-#define MAX_ERROR 200
-
-
-// Informe
-  // * Hacer
-
+#define CAPACIDAD 50
 
 int intervalo_verificar(char *inicio, char *final, Intervalo *intervalo) {
   char *errorI;
@@ -26,7 +21,6 @@ int intervalo_verificar(char *inicio, char *final, Intervalo *intervalo) {
   intervalo->final = finalD;
   return 1;
 }
-
 
 // error 1 = no corresponde a una funcion
 // error 2 = intervalo invalido
@@ -65,15 +59,17 @@ void copiar_seccion(char *comando, char *parte, int i, int *cont, int *indexToke
 char entrada_validar (char *comando, Intervalo *intervalo) {
   int i = 0, cont = 0;
   int indexToken = 0;
-  char eows[] = "[,]"; 
-  char *ident = calloc(1, sizeof(char)*50);
-  char *inicio = calloc(1, sizeof(char)*50);
-  char *final = calloc(1, sizeof(char)*50);
-  char *residuo = calloc(1, sizeof(char)*50);
+  char eows[] = "[,]";
+  // Variables que almacenaran las distintas secciones del comando.
+  char *ident = calloc(CAPACIDAD, sizeof(char));
+  char *inicio = calloc(CAPACIDAD, sizeof(char));
+  char *final = calloc(CAPACIDAD, sizeof(char));
+  char *residuo = calloc(CAPACIDAD, sizeof(char));
+
   for(; comando[i] != '\n' && comando[i] != '\r' ; i++, cont++) {
     // Copiamos residuo
     if (indexToken == 3) 
-      copiar_seccion(comando, residuo, i, &cont, &indexToken, '-');
+      copiar_seccion(comando, residuo, i, &cont, &indexToken, '\n');
     // Copiamos final
     if (indexToken == 2) 
       copiar_seccion(comando, final, i, &cont, &indexToken, eows[2]);
@@ -94,17 +90,16 @@ char entrada_validar (char *comando, Intervalo *intervalo) {
 
 }
 
-
 int main() {
 
   int salida = 1;
   AVLTree arbol = itree_crear();
+
   printf("Sea BIENVENIDO\n");
   while (salida) {
     char *comando = malloc(sizeof(char) * 200);
     // leemos con \n incluido
     fgets(comando, 200, stdin);
-    
     comando = realloc(comando, sizeof(char) * strlen(comando));
     
     Intervalo *intervalo = malloc(sizeof(Intervalo));
@@ -120,7 +115,6 @@ int main() {
 
     case 'e':
       arbol = itree_eliminar(arbol, intervalo, 0);
-      free(intervalo);
       break;
 
     case '?':{
@@ -131,82 +125,44 @@ int main() {
         printf("SI: ");
         intervalo_imprimir(inter->intervalo);      
       }
-      free(intervalo);
       break;
     }
     case 'd':
       itree_recorrer_dfs(arbol, intervalo_imprimir);
-      free(intervalo);
       break;
 
     case 'b':
       itree_recorrer_bfs(arbol, intervalo_imprimir);
-      free(intervalo);
       break;
 
     case 's':
       printf("Saliendo del progrema\n");
-      free(intervalo);
       salida = 0;
       break;
 
     case '1':
       printf("ERROR-Funcion invalida!\n");
-      free(intervalo);
       break;
 
     case '2':
       printf("ERROR-Intervalo invalido!\n");
-      free(intervalo);
       break;
 
     case '3':
       printf("ERROR-Caracteres irreconocibles tras ']'!\n");
-      free(intervalo);
       break;
 
     default:
-      free(intervalo);
+      printf("ERROR-Caso desconocido, no debiste llegar aqui...");
       break;
     }
+    // Si el intervalo no es insertado, o no es valido se libera ese espacio de memoria.
+    if (identificador != 'i')
+      free(intervalo);
   }
-
+  // Se destruye el arbol sobre el cual se realizan las opearaciones.
   itree_destruir(arbol);
 
-
-
-
-
-/*
-  //AVLTree arbol = NULL;
-  AVLTree arbol = NULL;
-  // Creacion
-  
-  for(double i=1; i < 30; i=i+2){
-    Intervalo* aux = (Intervalo*)malloc(sizeof(Intervalo));
-    aux->inicio = i;
-    if (i == 13){
-      aux->final = 400;
-    }else{
-      aux->final = i+1;
-    }
-    arbol = itree_insertar(arbol, aux);
-  }
-
-  Intervalo *a = malloc(sizeof(Intervalo));
-  a->inicio = 17;
-  a->final = 19;
-  itree_insertar(arbol, a);
-
-
-  // Eliminacion
-  //inorder(arbol);
-
-  itree_recorrer_bfs(arbol);
-  puts("");
-  //itree_recorrer_dfs(arbol);
-  itree_destruir(arbol);
-*/
   return 0;
 }
 
