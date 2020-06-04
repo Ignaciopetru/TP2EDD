@@ -5,7 +5,7 @@
 #include "avltree.h"
 #include "lists/queue.h"
 #include "lists/stack.h"
-#define CAPACIDAD 50
+#define CAPACIDAD 200
 
 int intervalo_verificar(char *inicio, char *final, Intervalo * intervalo) {
   char *errorI;
@@ -102,14 +102,22 @@ int main() {
   printf("Interfaz 1.0\n");
 
   while (salida) {
-    char *comando = malloc(sizeof(char) * 200);
+    char *comando = malloc(sizeof(char) * CAPACIDAD);
     // leemos con \n incluido
-    fgets(comando, 200, stdin);
-    comando = realloc(comando, sizeof(char) * strlen(comando));
-
     Intervalo *intervalo = malloc(sizeof(Intervalo));
-    char identificador = entrada_validar(comando, intervalo);
+    char identificador;
 
+    fgets(comando, CAPACIDAD, stdin);
+    // Si se excede la capacidad maxima queda caracteres en el buffer,
+    // en ese caso limpiamos el buffer y notificamos el error.
+    
+    if (strlen(comando) == CAPACIDAD-1 ){
+      scanf("%*[^\n]");
+      scanf("%*c");
+      identificador = '4'; 
+    } else
+      identificador = entrada_validar(comando, intervalo);
+    
     free(comando);
 
     // Dependiendo del identificador la accion sera distinta.
@@ -155,6 +163,10 @@ int main() {
 
     case '3':
       printf("ERROR-Caracteres irreconocibles tras ']'!\n");
+      break;
+
+    case '4':
+      printf("ERROR-Maximo de caracteres excedido!\n");
       break;
 
     default:
