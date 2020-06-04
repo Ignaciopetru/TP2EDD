@@ -8,57 +8,9 @@
 #define MAX_ERROR 200
 
 
-//TODO
-
-//-itree crear ✔️
-  // * Implementar ✔️
-
-//-itree destruir✔️
-  // * Implementar ✔️
-  // * Checkear que no haya filtraciones de memoria ✔️
-
-//-itree insertar✔️
-  // * Analizar que pasa con el segundo valor (ver en itree_destruir) ✔️
-
-//-itree eliminar✔️
-  // * Falta liberar la memoria del nodo y el puntero de su padre que apunta a el ✔️
-
-// itree intersetar✔️
-  // * Implementar ✔️
-  // * Testear su funcionamiento ✔️
-
-// itree recorrer dfs ✔️
-  // * Checkear que no haya filtraciones de memoria ✔️
-
-// itree recorrer bfs ✔️
-  // * Checkear que no haya filtraciones de memoria ✔️
-
-// mayorFinal (AVLNodo) ✔️
-  // * Usarla para la busqueda ✔️
-  // * Usarlo para no revisar el arbol si el mayorTotal es menor al inicial del dato ✔️
-
-// Interfaz
-  // * Hacerla (main)
-  // * Crear intervalo
-
-// Queue y Stack ✔️
-  // * Ver tema crecimiento dinamico ✔️
-  // * Mejorar escritura✔️
-
-// inodo_liberar✔️
-  // * Implementar ✔️
-  // * Ver si no filtramos memoria ✔️
-  
-// AVL
-  // * Pasar a su propio archivo y cabecera
-
-// Rotar ✔️
-  // * Testear derecha izquierda e izquierda derecha ✔️
-
 // Informe
   // * Hacer
 
-// * Ver si no filtramos memoria en los que tiene la tag ✔️
 
 int intervalo_verificar(char *inicio, char *final, Intervalo *intervalo) {
   char *errorI;
@@ -101,51 +53,41 @@ char funcion_verificar(char *ident, char *inicio, char *final, char *residuo, In
   return '1';
 }
 
+
+void fotocopiadora(char *comando, char *parte, int i, int cont, int *indexToken, char eow){
+  if (comando[i] == eow){
+    (*indexToken)++;
+    cont = -1;
+  }
+  else
+    parte[cont] = comando[i];
+}
+
+
+
 char entrada_validar (char *comando, Intervalo *intervalo) {
-  int i, indexToken = 0, cont = 0;
+  int i = 0, cont = 0;
+  int *indexToken = 0;
+  char eows[] = "[,]"; 
   char *ident = calloc(1, sizeof(char)*50);
   char *inicio = calloc(1, sizeof(char)*50);
   char *final = calloc(1, sizeof(char)*50);
   char *residuo = calloc(1, sizeof(char)*50);
-  for(i = 0; comando[i] != '\n' && comando[i] != '\r' ; i++) {
+  for(; comando[i] != '\n' && comando[i] != '\r' ; i++, cont++) {
     // Copiamos residuo
-    if (indexToken == 3) 
-      residuo[cont] = comando[i];
-
+    if ((*indexToken) == 3) 
+      fotocopiadora(comando, residuo, i, cont, indexToken, '-');
     // Copiamos final
-    if (indexToken == 2) {
-      if (comando[i] == ']'){
-        indexToken = 3;
-        cont = -1;
-      }
-      else
-        final[cont] = comando[i];
-    }
-
+    if ((*indexToken) == 2) 
+      fotocopiadora(comando, final, i, cont, indexToken, eows[2]);
     // Copiamos inicio
-    if (indexToken == 1) {
-      if (comando[i] == ','){
-        indexToken = 2;
-        cont = -1;
-      }
-      else
-        inicio[cont] = comando[i];
-    }
-
+    if ((*indexToken) == 1) 
+      fotocopiadora(comando, inicio, i, cont, indexToken, eows[1]);
     // Copiamos el identificador hasta encontrar la llave.
-    if (indexToken == 0) {
-      if (comando[i] == '['){
-        indexToken = 1;
-        cont = -1;
-      }
-      else
-        ident[cont] = comando[i];
-    }
-    // Aumentamos contador de letras.
-    cont++;
-
+    if ((*indexToken) == 0) 
+      fotocopiadora(comando, ident, i, cont, indexToken, eows[0]);
   }
-  residuo[cont] = '\0';
+  //residuo[cont] = '\0';
   char primeraLetra = funcion_verificar(ident, inicio, final, residuo, intervalo);
   free(ident);
   free(inicio);
