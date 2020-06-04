@@ -53,21 +53,18 @@ char funcion_verificar(char *ident, char *inicio, char *final, char *residuo, In
   return '1';
 }
 
-
-void fotocopiadora(char *comando, char *parte, int i, int cont, int *indexToken, char eow){
+void copiar_seccion(char *comando, char *parte, int i, int *cont, int *indexToken, char eow){
   if (comando[i] == eow){
     (*indexToken)++;
-    cont = -1;
+    (*cont) = -1;
   }
   else
-    parte[cont] = comando[i];
+    parte[(*cont)] = comando[i];
 }
-
-
 
 char entrada_validar (char *comando, Intervalo *intervalo) {
   int i = 0, cont = 0;
-  int *indexToken = 0;
+  int indexToken = 0;
   char eows[] = "[,]"; 
   char *ident = calloc(1, sizeof(char)*50);
   char *inicio = calloc(1, sizeof(char)*50);
@@ -75,19 +72,18 @@ char entrada_validar (char *comando, Intervalo *intervalo) {
   char *residuo = calloc(1, sizeof(char)*50);
   for(; comando[i] != '\n' && comando[i] != '\r' ; i++, cont++) {
     // Copiamos residuo
-    if ((*indexToken) == 3) 
-      fotocopiadora(comando, residuo, i, cont, indexToken, '-');
+    if (indexToken == 3) 
+      copiar_seccion(comando, residuo, i, &cont, &indexToken, '-');
     // Copiamos final
-    if ((*indexToken) == 2) 
-      fotocopiadora(comando, final, i, cont, indexToken, eows[2]);
+    if (indexToken == 2) 
+      copiar_seccion(comando, final, i, &cont, &indexToken, eows[2]);
     // Copiamos inicio
-    if ((*indexToken) == 1) 
-      fotocopiadora(comando, inicio, i, cont, indexToken, eows[1]);
+    if (indexToken == 1) 
+      copiar_seccion(comando, inicio, i, &cont, &indexToken, eows[1]);
     // Copiamos el identificador hasta encontrar la llave.
-    if ((*indexToken) == 0) 
-      fotocopiadora(comando, ident, i, cont, indexToken, eows[0]);
+    if (indexToken == 0) 
+      copiar_seccion(comando, ident, i, &cont, &indexToken, eows[0]);
   }
-  //residuo[cont] = '\0';
   char primeraLetra = funcion_verificar(ident, inicio, final, residuo, intervalo);
   free(ident);
   free(inicio);
