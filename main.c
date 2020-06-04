@@ -87,7 +87,6 @@ char entrada_validar (char *comando, Intervalo *intervalo) {
   free(residuo);
 
   return primeraLetra;
-
 }
 
 int main() {
@@ -95,7 +94,8 @@ int main() {
   int salida = 1;
   AVLTree arbol = itree_crear();
 
-  printf("Sea BIENVENIDO\n");
+  printf("Interfaz 1.0\n");
+
   while (salida) {
     char *comando = malloc(sizeof(char) * 200);
     // leemos con \n incluido
@@ -107,6 +107,7 @@ int main() {
     
     free(comando);
     
+    // Dependiendo del identificador la accion sera distinta.
     switch (identificador)
     {
     case 'i':
@@ -136,7 +137,7 @@ int main() {
       break;
 
     case 's':
-      printf("Saliendo del progrema\n");
+      printf("Saliendo del programa\n");
       salida = 0;
       break;
 
@@ -156,7 +157,8 @@ int main() {
       printf("ERROR-Caso desconocido, no debiste llegar aqui...");
       break;
     }
-    // Si el intervalo no es insertado, o no es valido se libera ese espacio de memoria.
+    // Si el intervalo no es insertado, o no es valido 
+    //se libera ese espacio de memoria.
     if (identificador != 'i')
       free(intervalo);
   }

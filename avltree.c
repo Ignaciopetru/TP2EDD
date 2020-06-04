@@ -5,7 +5,7 @@
 #include "lists/queue.h"
 #include "lists/stack.h"
 
-// Funciones auxiliares
+// Funciones auxiliares -------------------------------------------------------
 
 int max(int a, int b) {
     if(a > b)
@@ -26,24 +26,24 @@ int obtener_altura(AVLTree arbol) {
 }
 
 int obtener_balance(AVLTree arbol){
-  if(arbol)
+  if (arbol)
     return obtener_altura(arbol->der) - obtener_altura(arbol->izq);
   return 0;
 }
 
 double obtener_mayorFinal(AVLTree arbol){
-  if(arbol->der == NULL || arbol->izq == NULL){
+  if (arbol->der == NULL || arbol->izq == NULL) {
     AVLTree temp = arbol->izq ? arbol->izq : arbol->der;
       // Sin hijos
-    if(temp == NULL)
+    if (temp == NULL)
       return arbol->intervalo->final;
     else // Caso un hijo
       return max_double(arbol->intervalo->final, temp->mayorFinal);
-  } else
+  } else // Caso dos hijos
     return max_double(arbol->intervalo->final, max_double(arbol->izq->mayorFinal, arbol->der->mayorFinal));
 }
 
-// Funciones de rotacion y balanceo.
+// Funciones de rotacion y balanceo. ------------------------------------------
 
 AVLTree rotar_derecha(AVLTree arbol) {
     // Reservamos el izq del arbol
@@ -75,6 +75,7 @@ AVLTree rotar_izquierda(AVLTree arbol) {
     return copArbolDer;
 }
 
+// Segun el valor del balance del nodo se decide como rebalancearlo.
 AVLTree balancear(AVLTree arbol, int balance){
     //Izquierda Izquierda
     if (balance < -1 && obtener_balance(arbol->izq) <= 0)
@@ -96,7 +97,7 @@ AVLTree balancear(AVLTree arbol, int balance){
     return arbol;
 }
 
-// Funciones creacion
+// Funciones creacion ---------------------------------------------------------
 
 AVLTree itree_crear() {
     return NULL;
@@ -119,13 +120,13 @@ AVLTree itree_insertar(AVLTree arbol, Intervalo *dato) {
     }
     // Buscamos la posicion que debe ocupar el nuevo nodo
     // segun BST, teniendo en cuenta ambos valores del intervalos.
-    if(dato->inicio < arbol->intervalo->inicio)
+    if (dato->inicio < arbol->intervalo->inicio)
       arbol->izq = itree_insertar(arbol->izq, dato);
-    else if(dato->inicio > arbol->intervalo->inicio)
+    else if (dato->inicio > arbol->intervalo->inicio)
       arbol->der = itree_insertar(arbol->der, dato);
-    else if(dato->final < arbol->intervalo->final)
+    else if (dato->final < arbol->intervalo->final)
       arbol->izq = itree_insertar(arbol->izq, dato);
-    else if(dato->final > arbol->intervalo->final)
+    else if (dato->final > arbol->intervalo->final)
       arbol->der = itree_insertar(arbol->der, dato);
     // Caso en el que el nodo ya este en el arbol.
     else
@@ -138,7 +139,7 @@ AVLTree itree_insertar(AVLTree arbol, Intervalo *dato) {
     return balancear(arbol, balance);
 }
 
-// Funciones comparacion.
+// Funciones comparacion. -----------------------------------------------------
 
 int inodo_interseccion(Intervalo *datoArbol, Intervalo *dato){
   if(datoArbol->inicio <= dato->final && datoArbol->final >= dato->inicio)
@@ -183,7 +184,7 @@ AVLTree itree_intersecar(AVLTree arbol, Intervalo *dato){
       return itree_intersecar(arbol->der, dato);
 }
 
-// Funciones destrucción.
+// Funciones destrucción. -----------------------------------------------------
 
 void inodo_liberar(AVLTree arbol) {
   free(arbol->intervalo);
@@ -243,7 +244,7 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo *dato, int bandera){
     } else { // Caso dos hijos
       // Busco el nodo menor del hijo derecho
       AVLTree actual = arbol->der;
-      while(actual->izq != NULL)
+      while (actual->izq != NULL)
         actual = actual->izq;
       // Copio los datos del nodo encontrado y borro ese nodo
       free(arbol->intervalo);
@@ -254,7 +255,7 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo *dato, int bandera){
     }
   }
   // Si no quedan nodos tras la eliminacion (caso inicial no hijos), retornamos
-  if(arbol == NULL)
+  if (arbol == NULL)
     return arbol;
   // Actualizo la altura si es necesaria
   arbol->altura = 1 + max(obtener_altura(arbol->der), obtener_altura(arbol->izq));
@@ -267,7 +268,7 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo *dato, int bandera){
 }
 
 void itree_destruir(AVLTree arbol){
-  if(arbol != NULL){
+  if (arbol != NULL) {
     itree_destruir(arbol->der);
     itree_destruir(arbol->izq);
     inodo_liberar(arbol);
@@ -276,8 +277,12 @@ void itree_destruir(AVLTree arbol){
 
 // Funciones recorrer
 
+void intervalo_imprimir(Intervalo *intervalo) {
+  printf("[%f, %f]\n", intervalo->inicio, intervalo->final);
+}
+
 void inorder(AVLTree arbol) {
-  if(arbol == NULL)
+  if (arbol == NULL)
     return;
   inorder(arbol->izq);
   printf("[%f, %f] - maximo: %f altura:%d\n", arbol->intervalo->inicio, arbol->intervalo->final, arbol->mayorFinal, arbol->altura);
@@ -307,14 +312,9 @@ void itree_recorrer_bfs(AVLTree arbol, Visitante visitante) {
     AVLTree nodo = queue_sacar(queue);
     if (nodo != NULL) {
       visitante(nodo->intervalo);
-      //printf("[%f, %f]\n", nodo->intervalo->inicio, nodo->intervalo->final);
       queue_agregar(queue, nodo->izq);
       queue_agregar(queue, nodo->der);
     }
   }
   queue_destruir(queue);
-}
-
-void intervalo_imprimir(Intervalo *intervalo) {
-  printf("[%f, %f]\n", intervalo->inicio, intervalo->final);
 }

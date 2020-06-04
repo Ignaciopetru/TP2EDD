@@ -1,7 +1,7 @@
 all: main
 
 main: main.c stack.o queue.o dlist.o avltree.o
-	gcc -o main main.c avltree.o stack.o queue.o dlist.o -lm
+	gcc -Wall -Wextra -Werror -o main main.c avltree.o stack.o queue.o dlist.o -lm
 
 avltree.o: avltree.c avltree.h stack.o queue.o dlist.o
 	gcc -c -Wall -Wextra -Werror avltree.c
@@ -16,5 +16,4 @@ dlist.o: lists/dlist/dlist.c lists/dlist/dlist.h
 	gcc -c -c -Wall -Wextra -Werror lists/dlist/dlist.c
 
 clean:
-	rm *.o
-	rm main
+	rm -f *.o main main.exe
