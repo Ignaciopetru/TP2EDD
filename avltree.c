@@ -227,8 +227,7 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo * dato, int bandera) {
         if (bandera == 1)
           free(temp);
         arbol = NULL;
-        printf("Nodo eliminado. Caso sin hijos\n");
-      } else {                  // Caso un hijo
+      } else {// Caso un hijo
         // Caso directo, se libera intervalo de raiz, compia datos hijo
         // libera nodo hijo sin liberar intervalo
         if (bandera == 0) {
@@ -247,8 +246,6 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo * dato, int bandera) {
           arbol->der = temp->der;
           free(temp);
         }
-        printf("Nodo eliminado. Caso un hijo\n");
-        // ! Ver que hacer con maximoFinal
       }
     } else {                    // Caso dos hijos
       // Busco el nodo menor del hijo derecho
@@ -258,8 +255,6 @@ AVLTree itree_eliminar(AVLTree arbol, Intervalo * dato, int bandera) {
       // Copio los datos del nodo encontrado y borro ese nodo
       free(arbol->intervalo);
       arbol->intervalo = actual->intervalo;
-      printf
-          ("Nodo reemplazado. Caso dos hijos. Recursion para eliminar el remplazo\n");
       // bandera = 1 para no eliminar el intervalo al encontrar "actual"
       arbol->der = itree_eliminar(arbol->der, actual->intervalo, 1);
     }

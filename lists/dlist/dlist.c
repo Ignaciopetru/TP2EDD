@@ -30,7 +30,7 @@ DList dnodo_agregar_inicio(DList lista, void *dato) {
     // Caso lista con elementos.
     // Creo un nuevo nodo
     DNodo *nuevo = dnodo_crear(dato, NULL, lista);
-    // El antiguo primer elemento ahora es el segundo, asi que le asigno su ant.
+    // El antiguo primer elemento ahora es el segundo, asi que le asigno su ant
     lista->ant = nuevo;
     return nuevo;
   }
